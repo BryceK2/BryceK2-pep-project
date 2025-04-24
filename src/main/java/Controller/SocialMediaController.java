@@ -16,8 +16,15 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
-
+        app.post("/register", this::postRegisterHandler);
+        app.post("/login", this::postLoginHandler);
+        app.get("/messages", this::getAllMessagesHandler);
+        app.post("/messages", this::postMessagesHandler);
+        app.get("/messages/{message_id}", this::getMessageByIdHandler);
+        app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
+        app.patch("/messages/{message_id}", this::patchMessageByIdHandler);
+        app.get("accounts/{account_id}/messages", this::getAllMessagesByUserHandler);
+        app.start(8080);
         return app;
     }
 
@@ -25,9 +32,35 @@ public class SocialMediaController {
      * This is an example handler for an example endpoint.
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void exampleHandler(Context context) {
+    private void postRegisterHandler(Context context) {
         context.json("sample text");
     }
 
+    private void postLoginHandler(Context context) {
+        context.json("sample text");
+    }
 
+    private void getAllMessagesHandler(Context context) {
+        context.json("sample text");
+    }
+
+    private void postMessagesHandler(Context context) {
+        context.json("sample text");
+    }
+
+    private void getMessageByIdHandler(Context context) {
+        context.json("sample text");
+    }
+
+    private void deleteMessageByIdHandler(Context context) {
+        context.json("sample text");
+    }
+
+    private void patchMessageByIdHandler(Context context) {
+        context.json("sample text");
+    }
+
+    private void getAllMessagesByUserHandler(Context context) {
+        context.json("sample text");
+    }
 }
