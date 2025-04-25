@@ -1,11 +1,7 @@
 package Service;
 
 import Model.Account;
-import Model.Message;
 import DAO.AccountDAO;
-
-import java.sql.*;
-import java.util.List;
 
 public class AccountService {
     private AccountDAO accountDAO;

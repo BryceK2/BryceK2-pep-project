@@ -61,13 +61,20 @@ public class MessageService {
         //check if message exists to be updated and if valid message_text provided
         if(message != null && message_text.trim().length() > 0 && message_text.length() <= 255) {
             boolean patchSuccess = messageDAO.patchMessageById(message_text, message_id);
-            
-            //return message if successful patch, null if unsuccessful
-            return patchSuccess ? message : null;
+
+            //if patch success, update message obj to include patched message_text and return message
+            if(patchSuccess) {
+                message.setMessage_text(message_text);
+                return message;
+            }
         }
 
         //if invalid message_text or message_id doesn't exist in message table, return null
         return null;
     }
 
+    //service to get all messages by account_id
+    public List<Message> getAllMessagesByAccountId(int account_id){
+        return messageDAO.getAllMessagesByAccountId(account_id);
+    }
 }

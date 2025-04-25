@@ -11,11 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
-/**
- * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
- * found in readme.md as well as the test cases. You should
- * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
- */
 public class SocialMediaController {
     AccountService accountService;
     MessageService messageService;
@@ -26,64 +21,89 @@ public class SocialMediaController {
         this.messageService = new MessageService();
     }
 
-
-    /**
-     * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
-     * suite must receive a Javalin object from this method.
-     * @return a Javalin app object which defines the behavior of the Javalin controller.
-     */
+    //starts Javalin API and sets up endpoint routes
     public Javalin startAPI() {
         Javalin app = Javalin.create();
+
+        //register new account
         app.post("/register", this::postRegisterHandler);
+
+        //login with existing account
         app.post("/login", this::postLoginHandler);
+
+        //get all messages
         app.get("/messages", this::getAllMessagesHandler);
+
+        //post new message
         app.post("/messages", this::postMessageHandler);
+
+        //get message by message_id
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
+
+        //delete message by message_id
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
+
+        //update message by message_id
         app.patch("/messages/{message_id}", this::patchMessageByIdHandler);
+        
+        //get message(s) that correspond with account_id
         app.get("accounts/{account_id}/messages", this::getAllMessagesByUserHandler);
-        app.start(8080);
+
         return app;
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
+    //register new account handler
     private void postRegisterHandler(Context context) throws JsonProcessingException {
+        //get account object from request body
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(context.body(), Account.class);
+        
+        //call createAccount() in AccountService sending the Account passed by request body
         Account createdAccount = accountService.createAccount(account);
 
-        if(createdAccount != null) context.json(mapper.writeValueAsString(createdAccount));
+        //if account created, return JSON string of account object, else return 400 as response
+        if(createdAccount != null) context.json(createdAccount);
         else context.status(400);
     }
 
+    //login with existing account handler
     private void postLoginHandler(Context context) throws JsonProcessingException {
+        //get account object from request body
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(context.body(), Account.class);
+
+        //call loginAccount() in AccountService sending the Account passed by request body
         Account loginSuccessAccount = accountService.loginAccount(account);
 
-        if(loginSuccessAccount != null) context.json(mapper.writeValueAsString(loginSuccessAccount)); 
+        //if account credentials vaild, return JSON string of account object, else return 401 as response
+        if(loginSuccessAccount != null) context.json(loginSuccessAccount); 
         else context.status(401);
     }
 
+    //get all messages handler
     private void getAllMessagesHandler(Context context) {
+        //initialize messages list
         List<Message> messages = messageService.getAllMessages();
         
         //return messages with 200 status (even if messages list is empty)
         context.json(messages);
     }
 
+    //add message handler
     private void postMessageHandler(Context context) throws JsonProcessingException {
+        //get message object from request body
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(context.body(), Message.class);
+
+        //call addMessage() in MessageService sending the Message passed by request body
         Message addedMessage = messageService.addMessage(message);
 
-        if(addedMessage != null) context.json(mapper.writeValueAsString(addedMessage));
+        //if message added, return JSON string of added message object, else return 400 as response
+        if(addedMessage != null) context.json(addedMessage);
         else context.status(400);
     }
 
+    //get message by message_id handler
     private void getMessageByIdHandler(Context context) {
         //in future, should add NumberFormatException to check for invalid passed in ID
         //cast passed in parameter (String) to int
@@ -96,18 +116,20 @@ public class SocialMediaController {
         else context.result("");
     }
 
+    //delete message by message_id handler
     private void deleteMessageByIdHandler(Context context) {
         //in future, should add NumberFormatException to check for invalid passed in ID
         //cast passed in parameter (String) to int
         int message_id = Integer.parseInt(context.pathParam("message_id"));
         Message message = messageService.deleteMessageById(message_id);
 
-        //return deleted message with 200 status if message is not null
+        //return deleted message with 200 status as response if message is not null
         if(message != null) context.json(message);
         //return empty response if message is null
         else context.result("");
     }
 
+    //update message by message_id handler
     private void patchMessageByIdHandler(Context context) throws JsonProcessingException{
         //in future, should add NumberFormatException to check for invalid passed in ID
         //cast passed in parameter (String) to int
@@ -119,11 +141,20 @@ public class SocialMediaController {
         String message_text = message.getMessage_text();
         Message patchedMessage = messageService.patchMessageById(message_text, message_id);
 
+        //return updated message with 200 status as response if message is not null
         if(patchedMessage != null) context.json(patchedMessage);
+        //return 400 as response
         else context.status(400);
     }
 
+    //get all messages from specific user 
     private void getAllMessagesByUserHandler(Context context) {
-        context.json("sample text");
+        //in future, should add NumberFormatException to check for invalid passed in ID
+        //cast passed in parameter (String) to int
+        int account_id = Integer.parseInt(context.pathParam("account_id"));
+        List<Message> messages = messageService.getAllMessagesByAccountId(account_id);
+        
+        //return messages with 200 status as response (even if messages list is empty)
+        context.json(messages);
     }
 }

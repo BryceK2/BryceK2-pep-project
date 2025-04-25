@@ -9,6 +9,7 @@ public class Main {
     public static void main(String[] args) {
         SocialMediaController controller = new SocialMediaController();
         Javalin app = controller.startAPI();
+        //normally would start within startAPI method
         app.start(8080);
     }
 }

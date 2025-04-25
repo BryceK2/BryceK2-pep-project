@@ -162,4 +162,33 @@ public class MessageDAO {
         //return false if message failed to patch
         return false;
     }
+
+    //method to get all messages by account_id from message db
+    public List<Message> getAllMessagesByAccountId(int account_id) {
+        //connect to db using ConnectionUtil class
+        Connection connection = ConnectionUtil.getConnection();
+        
+        //initialize messages list
+        List<Message> messages = new ArrayList<>();
+
+        //try/catch block to execute query and catch any SQLException
+        try {
+            //query to get all messages from message db by account_id using inner join
+            String sql = "SELECT * FROM message JOIN account ON message.posted_by = account.account_id WHERE account.account_id=?;";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, account_id);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            //iterate through ResultSet obj rs, initializing new messages per record, then adding obj to messages list
+            while(rs.next()){
+                Message message = new Message(rs.getInt("message_id"), rs.getInt("posted_by"), 
+                    rs.getString("message_text"), rs.getLong("time_posted_epoch"));
+                messages.add(message);
+            }
+        } catch(SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        //return messages list that now contains all records of messages in message db
+        return messages;
+    }
 }

@@ -1,11 +1,9 @@
 package DAO;
 
 import Model.Account;
-import Model.Message;
 import Util.ConnectionUtil;
 
 import java.sql.*;
-import java.util.*;
 
 public class AccountDAO {
 
@@ -74,7 +72,7 @@ public class AccountDAO {
         //try/catch block to execute query and catch any SQLException
         try {
             //query to check if username and password found in account db
-            String sql = "SELECT username FROM account WHERE username=? AND password=?;";
+            String sql = "SELECT * FROM account WHERE username=? AND password=?;";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1, username);
